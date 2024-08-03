@@ -68,6 +68,23 @@ if user_input := st.chat_input("Ask me anything!"):
         f'<div class="user-message"><div class="message"><strong>{user_emoji}</strong> {user_input}</div></div>',
         unsafe_allow_html=True,
     )
+else:
+        # Call the Llama 3 API
+        try:
+            response = call_llama_api(st.session_state.messages)
+            assistant_response = response["choices"][0]["message"]["content"]
+            st.session_state.messages.append({"role": "assistant", "content": assistant_response})
+
+            # Display the assistant's response
+            st.markdown(
+                f'<div style="text-align: left; margin-bottom: 10px;"><strong>{assistant_emoji}</strong> {assistant_response}</div>',
+                unsafe_allow_html=True,
+            )
+        except requests.exceptions.RequestException as e:
+            st.error(f"API request failed: {e}")
+        except KeyError:
+            st.error("Unexpected response structure from API")
+
 
 
 
